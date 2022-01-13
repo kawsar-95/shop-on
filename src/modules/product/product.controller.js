@@ -1,10 +1,24 @@
 const Product = require("./product.model");
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
+const { getPagination, getPagingData } = require("./services/product.service");
+
+
+// start, end, total, limit, page
 
 async function getProducts(req, res) {
     try {
-        const products = await Product.findAll();
+        const { page, size, title } = req.query;
 
-        res.status(200).send(products);
+        const condition = title ? { product_name: { [Op.like]: `%${title}%` } } : null;
+
+        const { limit, offset } = getPagination(page, size);
+
+        const products = await Product.findAndCountAll({ where: condition, limit, offset });
+
+        const response = getPagingData(products, page, limit);
+
+        res.status(200).send(response);
     } catch (err) {
         console.error(err);
         res.status(500).send("Internal server error.");
