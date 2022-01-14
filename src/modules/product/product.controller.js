@@ -8,15 +8,15 @@ const { getPagination, getPagingData } = require("./services/product.service");
 
 async function getProducts(req, res) {
     try {
-        const { page, size, title } = req.query;
+        const { page, limit, title } = req.query;
 
         const condition = title ? { product_name: { [Op.like]: `%${title}%` } } : null;
 
-        const { limit, offset } = getPagination(page, size);
+        const { items, offset } = getPagination(page, limit);
 
-        const products = await Product.findAndCountAll({ where: condition, limit, offset });
+        const products = await Product.findAndCountAll({ where: condition, items, offset });
 
-        const response = getPagingData(products, page, limit);
+        const response = getPagingData(products, limit, offset);
 
         res.status(200).send(response);
     } catch (err) {

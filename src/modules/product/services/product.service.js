@@ -1,16 +1,20 @@
 const getPagination = (page, size) => {
-    const limit = size ? +size : 3;
-    const offset = page ? page * limit : 0;
+    const items = size ? +size : 3;
+    const offset = page ? page * items : 0;
 
-    return { limit, offset };
+    return { items, offset };
 };
 
-const getPagingData = (data, page, limit) => {
-    const { count: totalProducts, rows: product } = data;
-    const currentPage = page ? +page : 0;
-    const totalPages = Math.ceil(totalProducts / limit);
+const getPagingData = (data, limit, offset) => {
+    const { count: total, rows: products } = data;
+    const start = total - offset;
+    const end = parseInt(limit) + offset;
+    // const totalPages = Math.ceil(total / limit);
 
-    return { totalProducts, product, totalPages, currentPage };
+    return {
+        meta: { total, start, end },
+        products
+    };
 };
 
 module.exports.getPagination = getPagination;
